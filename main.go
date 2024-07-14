@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
+	"github.com/dadaxiaoxiao/payment/ioc"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -14,6 +17,7 @@ func main() {
 	// initViperRemote()
 
 	initPrometheus()
+	closeFunc := ioc.InitOTEL()
 	app := InitApp()
 	// 这里ginserver ，grpc server 可以同时启动
 	go func() {
@@ -21,12 +25,22 @@ func main() {
 		panic(err)
 	}()
 
-	err := app.GinServer.Start()
+	go func() {
+		for _, cron := range app.Crons {
+			cron.Start()
+		}
+	}()
 
-	for _, cron := range app.Crons {
-		cron.Start()
+	err := app.GinServer.Start()
+	if err != nil {
+		panic(err)
 	}
-	panic(err)
+
+	// 下面这些是正常退出
+	// 一分钟内要关完，且退出
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	closeFunc(ctx)
 }
 
 func initViper() {

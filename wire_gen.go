@@ -47,6 +47,6 @@ func InitApp() *customserver.App {
 
 // wire.go:
 
-var thirdPartyProvider = wire.NewSet(ioc.InitRedis, ioc.InitOTEL, ioc.InitLogger, ioc.InitDB, ioc.InitKafka, ioc.InitProducer, ioc.InitEtcdClient)
+var thirdPartyProvider = wire.NewSet(ioc.InitRedis, ioc.InitLogger, ioc.InitDB, ioc.InitKafka, ioc.InitProducer, ioc.InitEtcdClient)
 
 var jobProvider = wire.NewSet(ioc.InitCronJobBuilder, ioc.InitJobs)

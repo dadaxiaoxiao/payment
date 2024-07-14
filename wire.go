@@ -14,7 +14,6 @@ import (
 
 var thirdPartyProvider = wire.NewSet(
 	ioc.InitRedis,
-	ioc.InitOTEL,
 	ioc.InitLogger,
 	ioc.InitDB,
 	ioc.InitKafka,
